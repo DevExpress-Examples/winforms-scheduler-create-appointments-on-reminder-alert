@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using DevExpress.XtraEditors;
 using DevExpress.XtraScheduler;
-using DevExpress.XtraEditors;
+using System;
 
 namespace ReminderCustomActions {
     public partial class Form1 : XtraForm {
@@ -19,7 +11,7 @@ namespace ReminderCustomActions {
         public Form1() {
             InitializeComponent();
             // Create a custom field named CustomPrice. The Scheduler is not bound to a data source so the Price name is not used.
-            schedulerStorage1.Appointments.CustomFieldMappings.Add(new AppointmentCustomFieldMapping("CustomPrice", "Price"));
+            schedulerDataStorage1.Appointments.CustomFieldMappings.Add(new AppointmentCustomFieldMapping("CustomPrice", "Price"));
             // Subscribe to invoke a custom form.
             schedulerControl1.EditAppointmentFormShowing += SchedulerControl1_EditAppointmentFormShowing;
             // Subscribe to hide reminder icons for occurrences in the past.
@@ -29,9 +21,9 @@ namespace ReminderCustomActions {
 
             #region #reminder_init
             // Handle this event to perform a custom action when a reminder alert is fired.
-            schedulerStorage1.ReminderAlert += SchedulerStorage1_ReminderAlert;
+            schedulerDataStorage1.ReminderAlert += SchedulerDataStorage1_ReminderAlert;
             // Specify the interval at which the reminder is polled for alert.
-            schedulerStorage1.RemindersCheckInterval = checkInterval * 1000;
+            schedulerDataStorage1.RemindersCheckInterval = checkInterval * 1000;
             // Hide the reminder alert window.
             schedulerControl1.OptionsBehavior.ShowRemindersForm = false;
             #endregion #reminder_init
@@ -51,38 +43,14 @@ namespace ReminderCustomActions {
             this.timer1.Tick += Timer1_Tick;
         }
 
-        private void simpleButton1_Click(object sender, EventArgs e) {
-            DateTime apTime = DateTime.Now.AddSeconds(timeBeforeStart + timeBeforeAlert);
-            Appointment aptPattern = schedulerStorage1.CreateAppointment(AppointmentType.Pattern);
-            aptPattern.Subject = "Appointment with Reminder";
-            aptPattern.Description = "Recurring appointment with reminder";
-            aptPattern.Duration = TimeSpan.FromHours(2);
-            aptPattern.StatusKey = (int)AppointmentStatusType.OutOfOffice;
-            aptPattern.LabelKey = 2;
-            aptPattern.CustomFields["CustomPrice"] = (decimal)15.25;
-
-            aptPattern.RecurrenceInfo.Type = RecurrenceType.Daily;
-            aptPattern.RecurrenceInfo.Periodicity = 2;
-            aptPattern.RecurrenceInfo.Range = RecurrenceRange.OccurrenceCount;
-            aptPattern.RecurrenceInfo.OccurrenceCount = 10;
-            aptPattern.RecurrenceInfo.Start = apTime.AddDays(-4);
-
-            aptPattern.HasReminder = true;
-            aptPattern.Reminder.TimeBeforeStart = TimeSpan.FromSeconds(timeBeforeStart);
-
-            schedulerStorage1.Appointments.Add(aptPattern);
-
-            this.timer1.Start();
-            this.progressBarControl1.Visible = true;
-        }
         #region #reminderalert
-        private void SchedulerStorage1_ReminderAlert(object sender, ReminderEventArgs e) {
+        private void SchedulerDataStorage1_ReminderAlert(object sender, ReminderEventArgs e) {
             // Create a new appointment.
-            Appointment app = schedulerStorage1.CreateAppointment(AppointmentType.Normal);
+            Appointment app = schedulerDataStorage1.CreateAppointment(AppointmentType.Normal);
             app.Subject = "Created on alert from appointment w/Price = " + e.AlertNotifications[0].ActualAppointment.CustomFields["CustomPrice"];
             app.Start = e.AlertNotifications[0].ActualAppointment.Start.AddHours(2);
             app.Duration = TimeSpan.FromHours(4);
-            schedulerStorage1.Appointments.Add(app);
+            schedulerDataStorage1.Appointments.Add(app);
 
             // Modify the appointment for which the alert is triggered.
             e.AlertNotifications[0].ActualAppointment.LabelKey = 3;
@@ -102,29 +70,29 @@ namespace ReminderCustomActions {
         }
 
         private void SchedulerControl1_EditAppointmentFormShowing(object sender, AppointmentFormEventArgs e) {
+            SchedulerControl scheduler = sender as SchedulerControl;
             Appointment apt = e.Appointment;
-            bool openRecurrenceForm = apt.IsRecurring && schedulerStorage1.Appointments.IsNewAppointment(apt);
-
-            MyAppointmentEditForm myForm = new MyAppointmentEditForm((SchedulerControl)sender, apt, openRecurrenceForm);
+            bool openRecurrenceForm = apt.IsRecurring && scheduler.DataStorage.Appointments.IsNewAppointment(apt);
+            MyAppointmentEditForm myForm = new MyAppointmentEditForm(scheduler, apt, openRecurrenceForm);
             try {
                 myForm.LookAndFeel.ParentLookAndFeel = this.LookAndFeel.ParentLookAndFeel;
                 e.DialogResult = myForm.ShowDialog();
                 e.Handled = true;
-            }
-            finally {
+            } finally {
                 myForm.Dispose();
             }
         }
 
         private void btnCreateAppReminder_Click(object sender, EventArgs e) {
             DateTime apTime = DateTime.Now.AddSeconds(timeBeforeStart + timeBeforeAlert);
-            Appointment aptPattern = schedulerStorage1.CreateAppointment(AppointmentType.Pattern);
+            Appointment aptPattern = schedulerDataStorage1.CreateAppointment(AppointmentType.Pattern);
             aptPattern.Subject = "Appointment with Reminder";
             aptPattern.Description = "Recurring appointment with reminder";
             aptPattern.Duration = TimeSpan.FromHours(2);
-            aptPattern.StatusKey = (int)AppointmentStatusType.Busy;
-            aptPattern.LabelKey = 1;
+            aptPattern.StatusKey = (int)AppointmentStatusType.OutOfOffice;
+            aptPattern.LabelKey = 2;
             aptPattern.CustomFields["CustomPrice"] = (decimal)15.25;
+            aptPattern.Start = DateTime.Now;
 
             aptPattern.RecurrenceInfo.Type = RecurrenceType.Daily;
             aptPattern.RecurrenceInfo.Periodicity = 2;
@@ -135,8 +103,10 @@ namespace ReminderCustomActions {
             aptPattern.HasReminder = true;
             aptPattern.Reminder.TimeBeforeStart = TimeSpan.FromSeconds(timeBeforeStart);
 
+            schedulerDataStorage1.Appointments.Add(aptPattern);
+
             this.timer1.Start();
-            schedulerStorage1.Appointments.Add(aptPattern);
+            this.progressBarControl1.Visible = true;
         }
 
 
@@ -166,6 +136,5 @@ namespace ReminderCustomActions {
             }
             this.progressBarControl1.Update();
         }
-
     }
 }
