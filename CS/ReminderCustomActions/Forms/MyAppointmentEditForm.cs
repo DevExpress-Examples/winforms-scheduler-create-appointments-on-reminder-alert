@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows.Forms;
-
 using DevExpress.XtraScheduler;
 using DevExpress.XtraScheduler.UI;
 
@@ -36,8 +35,8 @@ namespace ReminderCustomActions {
 			//
 		}
 
-		protected AppointmentStorage Appointments {
-			get { return control.Storage.Appointments; }
+		protected IAppointmentStorage Appointments {
+			get { return control.DataStorage.Appointments; }
 		}
 		protected bool IsUpdateSuspended { get { return suspendUpdateCount > 0; } }
 
@@ -119,8 +118,8 @@ namespace ReminderCustomActions {
 				timeEnd.Time = DateTime.MinValue.AddTicks(controller.End.TimeOfDay.Ticks);
 				checkAllDay.Checked = controller.AllDay;
 
-				edStatus.Storage = control.Storage;
-				edLabel.Storage = control.Storage;
+				edStatus.Storage = control.DataStorage;
+				edLabel.Storage = control.DataStorage;
                 appointmentResourcesEdit1.SchedulerControl=control;
 
                 AppointmentResourceIdCollection resourceIds = appointmentResourcesEdit1.ResourceIds;
