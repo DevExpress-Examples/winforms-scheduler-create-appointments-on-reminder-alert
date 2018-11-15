@@ -1,3 +1,10 @@
+<!-- default file list -->
+*Files to look at*:
+
+* [Form1.cs](./CS/Form1.cs) (VB: [Form1.vb](./VB/Form1.vb))
+* [MyAppointmentEditForm.cs](./CS/Forms/MyAppointmentEditForm.cs) (VB: [MyAppointmentEditForm.vb](./VB/Forms/MyAppointmentEditForm.vb))
+* [Program.cs](./CS/Program.cs) (VB: [Program.vb](./VB/Program.vb))
+<!-- default file list end -->
 # Custom form, custom fields and custom actions on reminder alert
 
 
