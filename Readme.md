@@ -3,15 +3,76 @@
 [![](https://img.shields.io/badge/Open_in_DevExpress_Support_Center-FF7200?style=flat-square&logo=DevExpress&logoColor=white)](https://supportcenter.devexpress.com/ticket/details/E382)
 [![](https://img.shields.io/badge/📖_How_to_use_DevExpress_Examples-e9f6fc?style=flat-square)](https://docs.devexpress.com/GeneralInformation/403183)
 <!-- default badges end -->
-# Custom form, custom fields and custom actions on reminder alert
+# WinForms Scheduler - Create an appointment with custom fields, occurrence, and reminder
+
+* Run the project.
+* Click the **Create Appointment Serirs with Reminder** button.
+* The alert will be fired in 15 seconds. Before this happens, open the newly created today's appointment, change its "Price" value, and save your changes.
+
+![WinForms Scheduler Control](https://raw.githubusercontent.com/DevExpress-Examples/custom-form-custom-fields-and-custom-actions-on-reminder-alert-e382/18.1.3%2B/media/winforms-scheduler-reminder-alert.gif)
+
+The example demonstrates how to:
+
+* Create an appointment with custom fields, occurrence, and reminder.
+
+  ```csharp
+  private void btnCreateAppReminder_Click(object sender, EventArgs e) {
+      DateTime apTime = DateTime.Now.AddSeconds(timeBeforeStart + timeBeforeAlert);
+      Appointment aptPattern = schedulerDataStorage1.CreateAppointment(AppointmentType.Pattern);
+      aptPattern.Subject = "Appointment with Reminder";
+      aptPattern.Description = "Recurring appointment with reminder";
+      aptPattern.Duration = TimeSpan.FromHours(2);
+      aptPattern.StatusKey = (int)AppointmentStatusType.OutOfOffice;
+      aptPattern.LabelKey = 2;
+      aptPattern.CustomFields["CustomPrice"] = (decimal)15.25;
+      aptPattern.Start = DateTime.Now;
+      aptPattern.RecurrenceInfo.Type = RecurrenceType.Daily;
+      aptPattern.RecurrenceInfo.Periodicity = 2;
+      aptPattern.RecurrenceInfo.Range = RecurrenceRange.OccurrenceCount;
+      aptPattern.RecurrenceInfo.OccurrenceCount = 10;
+      aptPattern.RecurrenceInfo.Start = apTime.AddDays(-4);
+      aptPattern.HasReminder = true;
+      aptPattern.Reminder.TimeBeforeStart = TimeSpan.FromSeconds(timeBeforeStart);
+      schedulerDataStorage1.Appointments.Add(aptPattern);
+      this.timer1.Start();
+      this.progressBarControl1.Visible = true;
+  }
+  ```
+* Handle reminders.
+
+  ```csharp
+  private void SchedulerDataStorage1_ReminderAlert(object sender, ReminderEventArgs e) {
+      // Create a new appointment.
+      Appointment app = schedulerDataStorage1.CreateAppointment(AppointmentType.Normal);
+      app.Subject = "Created on alert from appointment w/Price = " + e.AlertNotifications[0].ActualAppointment.CustomFields["CustomPrice"];
+      app.Start = e.AlertNotifications[0].ActualAppointment.Start.AddHours(2);
+      app.Duration = TimeSpan.FromHours(4);
+      schedulerDataStorage1.Appointments.Add(app);
+      e.AlertNotifications[0].ActualAppointment.LabelKey = 3;
+      // Prevent the event from being fired one more time.
+      e.AlertNotifications[0].ActualAppointment.Reminder.Dismiss();
+  }
+  ```
+* Create and display a custom edit form.
+  
+  ```csharp
+  private void SchedulerControl1_EditAppointmentFormShowing(object sender, AppointmentFormEventArgs e) {
+      SchedulerControl scheduler = sender as SchedulerControl;
+      Appointment apt = e.Appointment;
+      bool openRecurrenceForm = apt.IsRecurring && scheduler.DataStorage.Appointments.IsNewAppointment(apt);
+      MyAppointmentEditForm myForm = new MyAppointmentEditForm(scheduler, apt, openRecurrenceForm);
+      try {
+          myForm.LookAndFeel.ParentLookAndFeel = this.LookAndFeel.ParentLookAndFeel;
+          e.DialogResult = myForm.ShowDialog();
+          e.Handled = true;
+      } finally {
+          myForm.Dispose();
+      }
+  ```
+* Access custom fields for occurrences.
 
 
-<p>The problem:</p>
-<p>Here is what I want to do:</p>
-<p>1) Create an appointment with custom fields and an alarm<br> 2) Add an occurrence for that appointment with alarm as well<br> 3) Prevent the alarm from showing and insert my own code for all occurrences<br> 4) Being able to access the custom fields data for all occurrences<br> 5) Dismiss the handled recurrent appointment</p>
-<p>The solution:</p>
-<p>Run the attached project. Click the "Create appointment with reminder" button. See the appointment series created at a current time of the day. The alert will be fired in 15 seconds by default. Before it happens, open the newly created today's appointment, change its "Price" value and save it. When the reminder is triggered, a new appointment is created with a Subject line informing of the changed value for the Price custom field.</p>
+## Documentation
 
-<br/>
-
-
+* [Appointments](https://docs.devexpress.com/WindowsForms/1753/controls-and-libraries/scheduler/appointments)
+* [Reminders for Appointments](https://docs.devexpress.com/WindowsForms/1778/controls-and-libraries/scheduler/appointments/reminders-for-appointments)
