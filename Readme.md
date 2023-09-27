@@ -3,17 +3,17 @@
 [![](https://img.shields.io/badge/Open_in_DevExpress_Support_Center-FF7200?style=flat-square&logo=DevExpress&logoColor=white)](https://supportcenter.devexpress.com/ticket/details/E382)
 [![](https://img.shields.io/badge/📖_How_to_use_DevExpress_Examples-e9f6fc?style=flat-square)](https://docs.devexpress.com/GeneralInformation/403183)
 <!-- default badges end -->
-# WinForms Scheduler - Create an appointment with custom fields, occurrence, and reminder
+# WinForms Scheduler - Create an appointment with custom fields, reccurrence, and reminders
 
 * Run the project.
-* Click the **Create Appointment Serirs with Reminder** button.
-* The alert will be fired in 15 seconds. Before this happens, open the newly created today's appointment, change its "Price" value, and save your changes.
+* Click the **Create Appointment Series with Reminder** button.
+* The alert will be fired in 15 seconds. Before this happens, open the newly created appointment, change its "Price" value, and save your changes.
 
 ![WinForms Scheduler Control](https://raw.githubusercontent.com/DevExpress-Examples/custom-form-custom-fields-and-custom-actions-on-reminder-alert-e382/18.1.3%2B/media/winforms-scheduler-reminder-alert.gif)
 
 The example demonstrates how to:
 
-* Create an appointment with custom fields, occurrence, and reminder.
+* Create an appointment with custom fields, reccurrence, and reminders.
 
   ```csharp
   private void btnCreateAppReminder_Click(object sender, EventArgs e) {
