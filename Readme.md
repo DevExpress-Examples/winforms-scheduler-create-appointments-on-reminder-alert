@@ -10,7 +10,7 @@
 * Click the **Create Appointment Series with Reminder** button.
 * The alert will be fired in 15 seconds. Before this happens, open the newly created appointment, change its "Price" value, and save your changes.
 
-![WinForms Scheduler Control](https://raw.githubusercontent.com/DevExpress-Examples/custom-form-custom-fields-and-custom-actions-on-reminder-alert-e382/18.1.3%2B/media/winforms-scheduler-reminder-alert.gif)
+![WinForms Scheduler Control](media/winforms-scheduler-reminder-alert.gif)
 
 The example demonstrates how to:
 
@@ -84,3 +84,4 @@ The example demonstrates how to:
 
 (you will be redirected to DevExpress.com to submit your response)
 <!-- feedback end -->
+
